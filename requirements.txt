@@ -2,7 +2,7 @@ numpy
 pandas
 tensorflow
 nltk
-sklearn
+scikit-learn
 
 streamlit
 st-annotated-text
