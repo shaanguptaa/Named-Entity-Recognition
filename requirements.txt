@@ -3,6 +3,6 @@ st-annotated-text
 
 numpy
 pandas
-tensorflow
+tensorflow==2.14.0
 nltk
 scikit-learn
