@@ -3,7 +3,7 @@
 ![Named Entity Recognition Banner](https://github.com/shaanguptaa/Named-Entity-Recognition/assets/84842443/6e3907e2-a545-454d-990b-d5cedec0bea0)
 
 
-![License: MIT](https://img.shields.io/github/license/shaanguptaa/Named-Entity-recognition?style=for-the-badge)
+![License: MIT](https://img.shields.io/github/license/shaanguptaa/Named-Entity-Recognition?style=for-the-badge)
 ![GitHub last commit](https://img.shields.io/github/last-commit/shaanguptaa/Named-Entity-recognition?style=for-the-badge)
 ![Python Version](https://img.shields.io/badge/python-3.11-yellow?style=for-the-badge&logo=python&color=%23F7CB3F)
 ![Tensorflow Version](https://img.shields.io/badge/Tensorflow-2.14-yellow?style=for-the-badge&logo=tensorflow&color=%23F7CB3F)
