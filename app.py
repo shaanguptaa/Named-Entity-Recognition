@@ -1,34 +1,22 @@
-from tensorflow.keras import models
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-import nltk
-import numpy as np
-import streamlit as st
+from numpy import load, array, argmax
 from annotated_text import annotated_text
+
+import streamlit as st
 
 # page config
 st.set_page_config(page_title=" Named Entity Recognition - Sahil Gupta", page_icon="🚀", layout="centered")
 
 # load model
-@st.cache_resource
-def load_model():
-    try:
-        model = models.load_model('model_cpu')
-        # model._make_predict_function()
-        # print('model loaded')
-        return model
-    except Exception as e:
-        raise Exception('Error loading ML Model')
+@st.cache_data
+def load_model_from_file():
+    from tensorflow.keras.models import load_model
+    return load_model('model_cpu')
 
 
 # load data (word2idx, etc)
 @st.cache_resource
 def load_data():
-    try:
-        (word2idx, max_len, tags) = np.load('data.npy', allow_pickle=True)
-        # print('data loaded')
-        return word2idx, max_len, tags
-    except Exception as e:
-        raise Exception('Error loading Resources')
+    return load('data.npy', allow_pickle=True)
 
 # styles
 st.markdown("""
@@ -79,6 +67,7 @@ st.markdown("""
                 
             """, unsafe_allow_html=True)
 
+
 # title and caption
 st.markdown('<p style="margin-top: -0.5em; text-align: center; color: white; font-size: 3.5em; font-weight: 600;">Named Entity Recognition</p>', unsafe_allow_html=True)
 
@@ -99,13 +88,7 @@ st.container().empty()
 output_container = st.container().empty()
 
 
-# preprocess text
-def preprocess_text(input_text, word2idx, max_len):
-    tokens = nltk.word_tokenize(input_text)
-    # print('data preprocessed')
-    return pad_sequences(sequences=[[word2idx.get(w, 0) for w in tokens]], padding="post", value=0, maxlen=max_len), tokens
-
-# Post Process (grouping words e.g. B-gpe and next immediate I-gpe will be combined as one B-gpe)
+# Grouping words (e.g. B-gpe and next immediate I-gpe will be combined as one B-gpe)
 def group_words(words):
     temp = [words[0]]
     for item in words[1:]:
@@ -137,54 +120,73 @@ def group_words(words):
         elif tag == 'B-per':
             group.append((word, 'Person'))
 
-    # print('data grouped')
     return group
 
 # post process
 def postprocess(prediction, tags, processed_input):
-    prediction = np.argmax(prediction, axis=-1)
+    prediction = argmax(prediction, axis=-1)
     prediction = [[w, tags[p]] for w, p in zip(processed_input, prediction[0])]
+    
     groups = group_words(prediction)
+    # print('data grouped')
 
-    # remove 'O' tags and make in format for annotated_text
+    # remove 'O' tags and make in format for annotated_text()
     groups = [item[0] if item[1] == 'O' else item for item in groups]
     
-    # print('data postprocessed')
     return groups
 
 # predict
 def predict(input_text):
-    try:
-        # load model
-        model = load_model()
-        # load data
-        word2idx, max_len, tags = load_data()
-        # preprocess text
-        ids, tokens = preprocess_text(input_text, word2idx, max_len)
-        # predict
-        prediction = model.predict(np.array([ids[0]]))
-        # print('data predicted')
-        # postprocess
-        output = postprocess(prediction, tags, tokens)
-        
-        return output
-    except Exception as e:
-        raise e
+    # load model
+    model = load_model_from_file()
+    # print('model loaded')
+    
+    # load data
+    word2idx, max_len, tags = load_data()
+    # print('data loaded')
+
+    # preprocess text
+    tokens = input_text.split()
+    from tensorflow.keras.preprocessing.sequence import pad_sequences
+    ids = pad_sequences(sequences=[[word2idx.get(w, 0) for w in tokens]], padding="post", value=0, maxlen=max_len)[0]
+    # print('data preprocessed')
+    
+    # predict
+    prediction = model.predict(array([ids]))
+    # print('data predicted')
+    
+    # postprocess
+    output = postprocess(prediction, tags, tokens)
+    # print('data postprocessed')
+    
+    return output
 
 
 # handle submit event
 def handle_submit():
-    with col1, st.spinner(''):
+    with col1, st.spinner('Processing...'):
         # col1.image("spinner.gif", width=24)
-        input_text = text_area.strip()
         try:
+            input_text = text_area.strip()
             if input_text == '':
-                raise Exception('Please enter a sentence')            
+                raise Exception('Please Enter a Sentence...')            
+            
             result = predict(input_text)
+            
             with output_container:
                 annotated_text(*result)
+        
+        except FileNotFoundError as e:
+            output_container.empty()
+            output_container.error("Error loading Model..." if e.filemane == 'model_cpu' else "Error load Resources...")
+
+        except NameError as e:
+            output_container.empty()
+            output_container.error("")
+        
         except Exception as e:
             output_container.error(e.__str__())
+            print(type(e), e)
 
 # handle button click
 if btn:
