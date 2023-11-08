@@ -192,7 +192,7 @@ if btn:
 
 # footer
 st.markdown("""
-    <div class="footer" style="position: fixed; bottom: 0; left: 0; width:100%; height:fit-content; z-index: 100;">
+    <div class="footer" style="position: fixed; bottom: 0; left: 0; width:100%; height:fit-content; z-index: 1000;">
         <p style="width: 100%; text-align: center; height:fit-content;">
             Designed & Developed by <a href="" target="_blank">Sahil Gupta</a> &nbsp; | &nbsp; 
             <a href="https://www.linkedin.com/in/sahilguptaa/" target="_blank"> <img src="/app/static/linkedin.png" alt="LinkedIn" width=20> </a>
