@@ -1,8 +1,8 @@
+streamlit
+st-annotated-text
+
 numpy
 pandas
 tensorflow
 nltk
 scikit-learn
-
-streamlit
-st-annotated-text
