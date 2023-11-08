@@ -1,0 +1,10 @@
+# for model training
+numpy
+pandas
+tensorflow
+nltk
+sklearn
+
+# for model deployment
+streamlit
+st-annotated-text
